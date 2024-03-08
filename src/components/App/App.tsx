@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import * as yup from 'yup';
-import { useQuery } from 'react-query';
+import { useMutation, useQuery } from 'react-query';
 import { useForm } from 'react-hook-form';
+import { Button, FormLayoutGroup, Panel, Spinner, View } from '@vkontakte/vkui';
 
 const validationSchema = yup.object().shape({
   name: yup
@@ -30,10 +31,37 @@ function App() {
   } = useForm({
     validationSchema,
   });
-  const { data: catFact, isLoading: catFactLoading, refetch: refetchCatFact } = useQuery('catFact', fetchCatFact);
+
   const [age, setAge] = useState<number | null>(null);
 
-  return <div>{catFact}</div>;
+  const { data: catFact, isLoading: catFactLoading, refetch: refetchCatFact } = useQuery('catFact', fetchCatFact);
+  const { mutate: fetchAgeMutation, isLoading: ageLoading } = useMutation(fetchAge);
+
+  const onSubmitName = async ({ name }: { name: string }) => {
+    try {
+      await fetchAgeMutation(name);
+    } catch (error) {
+      console.error('Ошибка при получении возраста:', error);
+    }
+  };
+
+  return (
+    <View activePanel="main">
+      <Panel id="main">
+        <FormLayoutGroup onSubmit={submitName(onSubmitName)}>
+          {ageLoading && <Spinner size="small" />}
+          {age !== null && <div>Ваш возраст: {age} лет</div>}
+        </FormLayoutGroup>
+
+        <div>
+          <Button onClick={() => refetchCatFact()} disabled={catFactLoading}>
+            Загрузить факт о котах
+          </Button>
+          {catFactLoading ? <Spinner size="small" /> : <div>{catFact}</div>}
+        </div>
+      </Panel>
+    </View>
+  );
 }
 
 export default App;
