@@ -1,7 +1,12 @@
-.container {
-    display: flex;
+.main {
     margin: 0 auto;
     max-width: 400px;
+    text-align: center;
+}
+
+.container {
+    margin-top: 20px;
+    display: flex;
     justify-content: center;
     align-items: center;
     flex-direction: column;

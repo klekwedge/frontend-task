@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@hookform/resolvers": "^3.3.4",
     "@vkontakte/vkui": "^6.0.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

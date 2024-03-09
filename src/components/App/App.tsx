@@ -1,9 +1,10 @@
 import { useState } from 'react';
+import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { useMutation, useQuery } from 'react-query';
-import { useForm } from 'react-hook-form';
-import { AppRoot, Button, FormLayoutGroup, Panel, PanelHeader, Spinner, View } from '@vkontakte/vkui';
-import './style.css'
+import { Controller, useForm } from 'react-hook-form';
+import { AppRoot, Button, FormLayoutGroup, Input, Panel, PanelHeader, Spinner, View } from '@vkontakte/vkui';
+import './style.css';
 
 const validationSchema = yup.object().shape({
   name: yup
@@ -28,9 +29,9 @@ function App() {
   const {
     handleSubmit: submitName,
     control: nameControl,
-    errors: nameErrors,
+    formState: { errors },
   } = useForm({
-    validationSchema,
+    resolver: yupResolver(validationSchema),
   });
 
   const [age, setAge] = useState<number | null>(null);
@@ -49,14 +50,29 @@ function App() {
   return (
     <AppRoot>
       <PanelHeader>Факты о котах</PanelHeader>
-      <View activePanel="main">
+      <View activePanel="main" className='main'>
         <Panel id="main">
           <FormLayoutGroup onSubmit={submitName(onSubmitName)}>
+            <Controller
+              name="name"
+              control={nameControl}
+              defaultValue=""
+              render={({ onChange, value }) => (
+                <Input
+                  value={value}
+                  onChange={(e) => onChange(e.target.value)}
+                  status={errors.name ? 'error' : undefined}
+                />
+              )}
+            />
+            <Button size="l" type="submit" disabled={ageLoading}>
+              Получить возраст
+            </Button>
             {ageLoading && <Spinner size="small" />}
             {age !== null && <div>Ваш возраст: {age} лет</div>}
           </FormLayoutGroup>
 
-          <div className='container'>
+          <div className="container">
             <Button onClick={() => refetchCatFact()} disabled={catFactLoading}>
               Загрузить факт о котах
             </Button>
