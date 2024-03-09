@@ -1,15 +1,10 @@
 
-function CatService() {
-    const getCatFact = async () => {
+class CatService {
+    static async getCatFact() {
         const response = await fetch('https://catfact.ninja/fact');
         const data = await response.json();
         return data.fact;
     };
-
-
-    return {
-        getCatFact
-    }
 }
 
-export default CatService()
+export default CatService;

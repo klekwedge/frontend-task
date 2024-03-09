@@ -10,43 +10,46 @@ import AgifyService from '../../services/AgifyService';
 import CatService from '../../services/CatService';
 
 import './style.css';
-
+import { TNameForm } from '../../types';
 
 function App() {
   const {
-    handleSubmit: submitName,
-    control: nameControl,
+    control,
+    handleSubmit,
     formState: { errors },
-  } = useForm({
+  } = useForm<TNameForm>({
     resolver: yupResolver(validationSchema),
+    mode: 'onSubmit',
+    criteriaMode: 'all',
+    reValidateMode: 'onChange',
   });
 
   const [age, setAge] = useState<number | null>(null);
 
-  const { data: catFact, isLoading: catFactLoading, refetch: refetchCatFact } = useQuery('catFact', CatService.getCatFact);
+  const {
+    data: catFact,
+    isLoading: catFactLoading,
+    refetch: refetchCatFact,
+  } = useQuery('catFact', CatService.getCatFact);
   const { mutate: fetchAgeMutation, isLoading: ageLoading } = useMutation(AgifyService.getAge, {
     onSuccess: (data) => {
       setAge(data);
     },
   });
 
-  const onSubmitName = async ({ name }: { name: string }) => {
-    try {
-      await fetchAgeMutation(name);
-    } catch (error) {
-      console.error('Ошибка при получении возраста:', error);
-    }
-  };
+  const onSubmitName = handleSubmit(({ name }: { name: string }) => {
+    fetchAgeMutation(name);
+  });
 
   return (
     <AppRoot>
       <PanelHeader>Факты о котах</PanelHeader>
       <View activePanel="main" className="main">
         <Panel id="main">
-          <FormLayoutGroup onSubmit={submitName(onSubmitName)}>
+          <FormLayoutGroup onSubmit={onSubmitName}>
             <Controller
               name="name"
-              control={nameControl}
+              control={control}
               defaultValue=""
               render={({ field }) => (
                 <Input {...field} type="text" placeholder="Введите имя" status={errors.name ? 'error' : undefined} />
