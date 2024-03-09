@@ -2,7 +2,8 @@ import { useState } from 'react';
 import * as yup from 'yup';
 import { useMutation, useQuery } from 'react-query';
 import { useForm } from 'react-hook-form';
-import { Button, FormLayoutGroup, Panel, Spinner, View } from '@vkontakte/vkui';
+import { AppRoot, Button, FormLayoutGroup, Panel, PanelHeader, Spinner, View } from '@vkontakte/vkui';
+import './style.css'
 
 const validationSchema = yup.object().shape({
   name: yup
@@ -46,21 +47,24 @@ function App() {
   };
 
   return (
-    <View activePanel="main">
-      <Panel id="main">
-        <FormLayoutGroup onSubmit={submitName(onSubmitName)}>
-          {ageLoading && <Spinner size="small" />}
-          {age !== null && <div>Ваш возраст: {age} лет</div>}
-        </FormLayoutGroup>
+    <AppRoot>
+      <PanelHeader>Факты о котах</PanelHeader>
+      <View activePanel="main">
+        <Panel id="main">
+          <FormLayoutGroup onSubmit={submitName(onSubmitName)}>
+            {ageLoading && <Spinner size="small" />}
+            {age !== null && <div>Ваш возраст: {age} лет</div>}
+          </FormLayoutGroup>
 
-        <div>
-          <Button onClick={() => refetchCatFact()} disabled={catFactLoading}>
-            Загрузить факт о котах
-          </Button>
-          {catFactLoading ? <Spinner size="small" /> : <div>{catFact}</div>}
-        </div>
-      </Panel>
-    </View>
+          <div className='container'>
+            <Button onClick={() => refetchCatFact()} disabled={catFactLoading}>
+              Загрузить факт о котах
+            </Button>
+            {catFactLoading ? <Spinner size="small" /> : <div>{catFact}</div>}
+          </div>
+        </Panel>
+      </View>
+    </AppRoot>
   );
 }
 
