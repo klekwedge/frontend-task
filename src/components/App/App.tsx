@@ -4,6 +4,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { useMutation, useQuery } from 'react-query';
 import { Controller, useForm } from 'react-hook-form';
 import { AppRoot, Button, FormLayoutGroup, Input, Panel, PanelHeader, Spinner, View } from '@vkontakte/vkui';
+// import bridge from '@vkontakte/vk-bridge';
 
 import validationSchema from '../../schemas';
 import AgifyService from '../../services/AgifyService';
@@ -11,6 +12,8 @@ import CatService from '../../services/CatService';
 
 import './style.css';
 import { TNameForm } from '../../types';
+
+// bridge.send('VKWebAppInit');
 
 function App() {
   const {
