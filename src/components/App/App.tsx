@@ -19,7 +19,7 @@ function App() {
       <View activePanel="main" className="main">
         <Panel id="main">
           <AgeForm />
-          <CatFacts />
+          {/* <CatFacts /> */}
         </Panel>
       </View>
     </AppRoot>
