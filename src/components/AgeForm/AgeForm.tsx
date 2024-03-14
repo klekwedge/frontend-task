@@ -8,8 +8,10 @@ import AgifyService from '../../services/AgifyService';
 import validationSchema from '../../schemas';
 import { TNameForm } from '../../types';
 
-
 function AgeForm() {
+  const [age, setAge] = useState<number | null>(null);
+  const [lastInputValue, setLastInputValue] = useState<string>('');
+
   const {
     handleSubmit,
     control,
@@ -18,16 +20,25 @@ function AgeForm() {
     resolver: yupResolver(validationSchema),
   });
 
-  const [age, setAge] = useState<number | null>(null);
   const { mutate: fetchAgeMutation, isLoading: ageLoading } = useMutation(AgifyService.getAge, {
     onSuccess: (data) => {
+      console.log('request');
       setAge(data);
     },
   });
 
   const onSubmitName = handleSubmit(({ name }: { name: string }) => {
-    fetchAgeMutation(name);
+    if (name !== lastInputValue) {
+      fetchAgeMutation(name);
+      setLastInputValue(name);
+    }
   });
+
+  // const handleInputChange = () => {
+  //   setTimeout(() => {
+  //     onSubmitName();
+  //   }, 3000);
+  // };
 
   return (
     <form onSubmit={onSubmitName}>
@@ -37,7 +48,13 @@ function AgeForm() {
           defaultValue=""
           control={control}
           render={({ field }) => (
-            <Input {...field} type="text" placeholder="Введите имя" status={errors.name ? 'error' : 'default'} />
+            <Input
+              {...field}
+              type="text"
+              placeholder="Введите имя"
+              status={errors.name ? 'error' : 'default'}
+              // onChangeCapture={handleInputChange}
+            />
           )}
         />
         <Button size="s" type="submit" disabled={ageLoading}>
@@ -46,7 +63,7 @@ function AgeForm() {
       </FormItem>
       {errors.name && <div>{errors.name.message}</div>}
       {ageLoading && <Spinner size="small" />}
-      {!ageLoading && age !== null && <Div>Ваш возраст: {age} лет</Div>}
+      {!ageLoading && age !== null && !errors.name && <Div>Ваш возраст: {age} лет</Div>}
     </form>
   );
 }
