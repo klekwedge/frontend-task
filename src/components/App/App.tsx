@@ -23,6 +23,7 @@ import CatService from '../../services/CatService';
 
 import './style.css';
 import { TNameForm } from '../../types';
+import CatFacts from '../CatFacts/CatFacts';
 
 // bridge.send('VKWebAppInit');
 
@@ -32,16 +33,10 @@ function App() {
     control,
     formState: { errors },
   } = useForm<TNameForm>({
-    resolver: yupResolver(validationSchema)
+    resolver: yupResolver(validationSchema),
   });
 
   const [age, setAge] = useState<number | null>(null);
-
-  const {
-    data: catFact,
-    isLoading: catFactLoading,
-    refetch: refetchCatFact,
-  } = useQuery('catFact', CatService.getCatFact);
 
   const { mutate: fetchAgeMutation, isLoading: ageLoading } = useMutation(AgifyService.getAge, {
     onSuccess: (data) => {
@@ -77,12 +72,7 @@ function App() {
             {!ageLoading && age !== null && <Div>Ваш возраст: {age} лет</Div>}
           </form>
 
-          <Div className="container">
-            <Button onClick={() => refetchCatFact()} disabled={catFactLoading}>
-              Загрузить факт о котах
-            </Button>
-            {catFactLoading ? <Spinner size="small" /> : <Div>{catFact}</Div>}
-          </Div>
+          <CatFacts />
         </Panel>
       </View>
     </AppRoot>
