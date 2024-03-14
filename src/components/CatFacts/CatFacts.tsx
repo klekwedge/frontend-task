@@ -1,21 +1,43 @@
-import React from 'react';
+import { Button, Div, Spinner, Textarea } from '@vkontakte/vkui';
+import { useEffect, useRef } from 'react';
 import { useQuery } from 'react-query';
-import { Button, Div, Spinner } from '@vkontakte/vkui';
 import CatService from '../../services/CatService';
 
 function CatFacts() {
+  const textAreaRef = useRef<HTMLTextAreaElement>(null);
+
   const {
     data: catFact,
     isLoading: catFactLoading,
     refetch: refetchCatFact,
   } = useQuery('catFact', CatService.getCatFact);
 
+  useEffect(() => {
+    if (textAreaRef.current) {
+      textAreaRef.current.focus();
+    }
+  }, [catFact]);
+
   return (
     <Div className="container">
       <Button onClick={() => refetchCatFact()} disabled={catFactLoading}>
         Загрузить факт о котах
       </Button>
-      {catFactLoading ? <Spinner size="small" /> : <Div>{catFact}</Div>}
+      {catFactLoading ? (
+        <Spinner size="small" />
+      ) : (
+        <Textarea
+          getRef={textAreaRef}
+          value={catFact}
+          onFocus={(e) => {
+            const firstSpaceIndex = (e.target.value || '').indexOf(' ');
+            if (firstSpaceIndex !== -1) {
+              e.target.setSelectionRange(firstSpaceIndex + 1, firstSpaceIndex);
+            }
+          }}
+          style={{ width: '400px'}}
+        />
+      )}
     </Div>
   );
 }
