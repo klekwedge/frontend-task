@@ -4,8 +4,6 @@ import { AppRoot, Div, Panel, PanelHeader, View } from '@vkontakte/vkui';
 import CatFacts from '../CatFacts/CatFacts';
 import AgeForm from '../AgeForm/AgeForm';
 
-import './style.css';
-
 function App() {
   return (
     <AppRoot>
