@@ -10,6 +10,10 @@ import validationSchema from '../../schemas';
 import { TNameForm } from '../../types';
 
 function AgeForm() {
+  const [lastInputValue, setLastInputValue] = useState<string>('');
+  const [isTyping, setIsTyping] = useState<boolean>(false);
+  const abortControllerRef = useRef<AbortController | null>(null);
+
   const {
     handleSubmit,
     control,
@@ -19,17 +23,32 @@ function AgeForm() {
     resolver: yupResolver(validationSchema),
   });
 
-  const [lastInputValue, setLastInputValue] = useState<string>('');
-  const [isTyping, setIsTyping] = useState<boolean>(false);
-  const abortControllerRef = useRef<AbortController | null>(null);
-
   const {
     data: age,
     isLoading: ageLoading,
     refetch: refetchAge,
-  } = useQuery(['age'], () => AgifyService.getAge(control._formValues.name), {
+  } = useQuery('age', () => AgifyService.getAge(control._formValues.name), {
     enabled: false,
   });
+
+  const getAgeSuffix = (value: number): string => {
+    const lastDigit = value % 10;
+    const lastTwoDigits = value % 100;
+
+    if (lastTwoDigits >= 11 && lastTwoDigits <= 14) {
+      return 'лет';
+    }
+
+    if (lastDigit === 1) {
+      return 'год';
+    }
+
+    if (lastDigit >= 2 && lastDigit <= 4) {
+      return 'года';
+    }
+
+    return 'лет';
+  };
 
   const onSubmitName = handleSubmit(({ name }: { name: string }) => {
     if (name !== lastInputValue) {
@@ -89,7 +108,12 @@ function AgeForm() {
       </FormItem>
       {errors.name && <div>{errors.name.message}</div>}
       {ageLoading && <Spinner size="small" />}
-      {!ageLoading && age && !errors.name && <Div>Ваш возраст: {age} лет</Div>}
+      {!ageLoading && age && !errors.name && (
+        <Div>
+          Ваш возраст: {age} {getAgeSuffix(age)}
+        </Div>
+      )}
+      {!ageLoading && !errors.name && <Div>Невозможно определить возраст по имени</Div>}
     </form>
   );
 }
