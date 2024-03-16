@@ -1,5 +1,6 @@
+/* eslint-disable react/jsx-props-no-spreading */
 /* eslint-disable no-underscore-dangle */
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useQuery } from 'react-query';
 import { useForm, Controller } from 'react-hook-form';
 import { Button, Div, FormItem, Input, Spinner } from '@vkontakte/vkui';
@@ -20,6 +21,7 @@ function AgeForm() {
 
   const [lastInputValue, setLastInputValue] = useState<string>('');
   const [isTyping, setIsTyping] = useState<boolean>(false);
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   const {
     data: age,
@@ -29,28 +31,35 @@ function AgeForm() {
     enabled: false,
   });
 
-  useEffect(() => {
-    let timer: number;
-    if (control._formValues.name !== lastInputValue) {
-        timer = setTimeout(() => {
-        if (isTyping) {
-          refetchAge();
-          setLastInputValue(control._formValues.name);
-          setIsTyping(false);
-        }
-      }, 3000);
-    }
-
-    return () => clearTimeout(timer);
-  }, [control._formValues.name, isTyping, refetchAge]);
-
   const onSubmitName = handleSubmit(({ name }: { name: string }) => {
     if (name !== lastInputValue) {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+
       refetchAge();
       setLastInputValue(name);
       setIsTyping(false);
     }
   });
+
+  useEffect(() => {
+    let timer: number;
+    if (control._formValues.name !== lastInputValue) {
+      timer = setTimeout(() => {
+        if (isTyping) {
+          onSubmitName();
+        }
+      }, 3000);
+    }
+
+    return () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+      clearTimeout(timer);
+    };
+  }, [control._formValues.name, isTyping]);
 
   const handleTyping = (event: React.ChangeEvent<HTMLInputElement>) => {
     setValue('name', event.target.value);

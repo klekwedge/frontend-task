@@ -10,7 +10,9 @@ function CatFacts() {
     data: catFact,
     isLoading: catFactLoading,
     refetch: refetchCatFact,
-  } = useQuery('catFact', CatService.getCatFact);
+  } = useQuery('catFact', CatService.getCatFact, {
+    enabled: false,
+  });
 
   useEffect(() => {
     if (textAreaRef.current) {
@@ -35,7 +37,7 @@ function CatFacts() {
               e.target.setSelectionRange(firstSpaceIndex + 1, firstSpaceIndex);
             }
           }}
-          style={{ width: '400px', minHeight: '80px'}}
+          style={{ width: '400px', minHeight: '80px' }}
         />
       )}
     </Div>
