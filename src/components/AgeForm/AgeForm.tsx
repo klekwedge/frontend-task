@@ -113,7 +113,7 @@ function AgeForm() {
           Ваш возраст: {age} {getAgeSuffix(age)}
         </Div>
       )}
-      {!ageLoading && !errors.name && <Div>Невозможно определить возраст по имени</Div>}
+      {!ageLoading && !errors.name && age === null && <Div>Невозможно определить возраст по имени</Div>}
     </form>
   );
 }
