@@ -1,6 +1,5 @@
 /* eslint-disable no-underscore-dangle */
-/* eslint-disable react/jsx-props-no-spreading */
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuery } from 'react-query';
 import { useForm, Controller } from 'react-hook-form';
 import { Button, Div, FormItem, Input, Spinner } from '@vkontakte/vkui';
@@ -13,27 +12,50 @@ function AgeForm() {
   const {
     handleSubmit,
     control,
+    setValue,
     formState: { errors },
   } = useForm<TNameForm>({
     resolver: yupResolver(validationSchema),
   });
 
   const [lastInputValue, setLastInputValue] = useState<string>('');
+  const [isTyping, setIsTyping] = useState<boolean>(false);
 
   const {
     data: age,
     isLoading: ageLoading,
     refetch: refetchAge,
-  } = useQuery(['age', control._formValues.name], () => AgifyService.getAge(control._formValues.name), {
+  } = useQuery(['age'], () => AgifyService.getAge(control._formValues.name), {
     enabled: false,
   });
+
+  useEffect(() => {
+    let timer: number;
+    if (control._formValues.name !== lastInputValue) {
+        timer = setTimeout(() => {
+        if (isTyping) {
+          refetchAge();
+          setLastInputValue(control._formValues.name);
+          setIsTyping(false);
+        }
+      }, 3000);
+    }
+
+    return () => clearTimeout(timer);
+  }, [control._formValues.name, isTyping, refetchAge]);
 
   const onSubmitName = handleSubmit(({ name }: { name: string }) => {
     if (name !== lastInputValue) {
       refetchAge();
       setLastInputValue(name);
+      setIsTyping(false);
     }
   });
+
+  const handleTyping = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setValue('name', event.target.value);
+    setIsTyping(true);
+  };
 
   return (
     <form onSubmit={onSubmitName}>
@@ -43,7 +65,13 @@ function AgeForm() {
           defaultValue=""
           control={control}
           render={({ field }) => (
-            <Input {...field} type="text" placeholder="Введите имя" status={errors.name ? 'error' : 'default'} />
+            <Input
+              {...field}
+              type="text"
+              placeholder="Введите имя"
+              status={errors.name ? 'error' : 'default'}
+              onChange={handleTyping}
+            />
           )}
         />
         <Button size="s" type="submit" disabled={ageLoading}>

@@ -1,10 +1,5 @@
 /* eslint-disable react/jsx-props-no-spreading */
-import {
-  AppRoot,
-  Panel,
-  PanelHeader,
-  View,
-} from '@vkontakte/vkui';
+import { AppRoot, Div, Panel, PanelHeader, View } from '@vkontakte/vkui';
 
 import CatFacts from '../CatFacts/CatFacts';
 import AgeForm from '../AgeForm/AgeForm';
@@ -12,14 +7,15 @@ import AgeForm from '../AgeForm/AgeForm';
 import './style.css';
 
 function App() {
-
   return (
     <AppRoot>
-      <PanelHeader>Факты о котах</PanelHeader>
+      <PanelHeader>Тестовое задание</PanelHeader>
       <View activePanel="main" className="main">
         <Panel id="main">
-          <AgeForm />
-          {/* <CatFacts /> */}
+          <Div style={{ display: 'flex', flexDirection: 'column', gap: '50px', alignItems: 'center' }}>
+            <AgeForm />
+            <CatFacts />
+          </Div>
         </Panel>
       </View>
     </AppRoot>
