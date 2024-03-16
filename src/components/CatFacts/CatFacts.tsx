@@ -37,7 +37,7 @@ function CatFacts() {
               e.target.setSelectionRange(firstSpaceIndex + 1, firstSpaceIndex);
             }
           }}
-          style={{ width: '400px', minHeight: '80px' }}
+          style={{ width: '350px', minHeight: '80px' }}
         />
       )}
     </Div>
