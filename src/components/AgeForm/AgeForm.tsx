@@ -29,7 +29,7 @@ function AgeForm() {
     refetch: refetchAge,
   } = useQuery('age', () => AgifyService.getAge(control._formValues.name, abortController?.signal), {
     enabled: false,
-    onSuccess: () => setAbortController(null)
+    onSuccess: () => setAbortController(null),
   });
 
   const getAgeSuffix = (value: number): string => {
@@ -67,14 +67,11 @@ function AgeForm() {
   });
 
   useEffect(() => {
-    let timer: number;
-    if (control._formValues.name !== lastInputValue) {
-      timer = setTimeout(() => {
-        if (isTyping) {
-          onSubmitName();
-        }
-      }, 3000);
-    }
+    const timer = setTimeout(() => {
+      if (isTyping) {
+        onSubmitName();
+      }
+    }, 3000);
 
     return () => {
       if (abortController) {
