@@ -1,6 +1,6 @@
 /* eslint-disable react/jsx-props-no-spreading */
 /* eslint-disable no-underscore-dangle */
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuery } from 'react-query';
 import { useForm, Controller } from 'react-hook-form';
 import { Button, Div, FormItem, Input, Spinner } from '@vkontakte/vkui';
@@ -12,7 +12,7 @@ import { TNameForm } from '../../types';
 function AgeForm() {
   const [lastInputValue, setLastInputValue] = useState<string>('');
   const [isTyping, setIsTyping] = useState<boolean>(false);
-  const abortControllerRef = useRef<AbortController | null>(null);
+  const [abortController, setAbortController] = useState<AbortController | null>(null);
 
   const {
     handleSubmit,
@@ -27,8 +27,9 @@ function AgeForm() {
     data: age,
     isLoading: ageLoading,
     refetch: refetchAge,
-  } = useQuery('age', () => AgifyService.getAge(control._formValues.name), {
+  } = useQuery('age', () => AgifyService.getAge(control._formValues.name, abortController?.signal), {
     enabled: false,
+    onSuccess: () => setAbortController(null)
   });
 
   const getAgeSuffix = (value: number): string => {
@@ -52,9 +53,12 @@ function AgeForm() {
 
   const onSubmitName = handleSubmit(({ name }: { name: string }) => {
     if (name !== lastInputValue) {
-      if (abortControllerRef.current) {
-        abortControllerRef.current.abort();
+      if (abortController) {
+        abortController.abort();
       }
+
+      const newAbortController = new AbortController();
+      setAbortController(newAbortController);
 
       refetchAge();
       setLastInputValue(name);
@@ -73,8 +77,8 @@ function AgeForm() {
     }
 
     return () => {
-      if (abortControllerRef.current) {
-        abortControllerRef.current.abort();
+      if (abortController) {
+        abortController.abort();
       }
       clearTimeout(timer);
     };
